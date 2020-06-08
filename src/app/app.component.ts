@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {User} from '../dto/user';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormGroup} from '@angular/forms';
+import {UserFormService} from './user-form.service';
 
 @Component({
   selector: 'app-root',
@@ -10,14 +10,10 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 export class AppComponent implements OnInit {
 
   form: FormGroup;
-  user: User;
   isSubmittedFormValid: boolean;
   submittedData: any;
 
-  constructor(private fb: FormBuilder) {
-    this.form = fb.group({
-      address: fb.control('', [Validators.required, Validators.minLength(5)])
-    });
+  constructor(private userFormService: UserFormService) {
   }
 
   ngOnInit() {
@@ -29,19 +25,15 @@ export class AppComponent implements OnInit {
         birthDate: new Date()
       }
     };
-    this.form.setValue({
-      address: portfolio.address
-    });
-    this.user = portfolio.user;
-  }
 
+    /**
+     * This component has to know the UserFormService and that there will be a FormGroup 'user' present.
+     */
+    this.form = this.userFormService.build(portfolio);
+  }
 
   onSubmit() {
     this.isSubmittedFormValid = this.form.valid;
     this.submittedData = this.form.value;
-  }
-
-  onInitialisedPersoenlicheAngabenForm(formGroup: FormGroup) {
-    this.form.addControl('user', formGroup);
   }
 }

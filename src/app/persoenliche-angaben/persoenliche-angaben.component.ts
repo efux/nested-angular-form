@@ -1,32 +1,39 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {User} from '../../dto/user';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {FormGroup, Validators} from '@angular/forms';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-persoenliche-angaben',
   templateUrl: './persoenliche-angaben.component.html',
   styleUrls: ['./persoenliche-angaben.component.css']
 })
-export class PersoenlicheAngabenComponent implements OnInit {
+export class PersoenlicheAngabenComponent implements OnInit, OnDestroy {
 
-  @Input() user: User;
-  @Output() initialisedForm = new EventEmitter<FormGroup>();
+  @Input() persoenlicheAngabenFormGroup: FormGroup;
 
-  form: FormGroup;
-
-  constructor(private fb: FormBuilder) {
-    this.form = fb.group({
-      firstName: fb.control('', [Validators.required, Validators.minLength(5), Validators.maxLength(20)]),
-      lastName: fb.control('', [Validators.required, Validators.minLength(5), Validators.maxLength(20)])
-    });
-  }
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
-    this.form.setValue({
-      firstName: this.user.firstName,
-      lastName: this.user.lastName
-    });
-    this.initialisedForm.emit(this.form);
+    /* I could adapt default values here by reacting to Input() variables to this component
+     * or adapt the validation rules, although I think this should be the job the service as well.
+     *
+     * The job of this component is to add changes to the visual representation of the form and maybe
+     * react to other changes. Form Creation is job of the Service.
+     */
+
+    // e.g. adapt validation rules
+    this.persoenlicheAngabenFormGroup.controls.firstName.setValidators([Validators.required, Validators.minLength(10)]);
+
+    // react to changes in the form
+    this.persoenlicheAngabenFormGroup.controls.lastName.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(lastName => console.log(lastName));
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

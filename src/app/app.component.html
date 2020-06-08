@@ -5,7 +5,7 @@
       <mat-label>Address</mat-label>
       <input formControlName="address" matInput/>
     </mat-form-field>
-    <app-persoenliche-angaben [user]="user" (initialisedForm)="onInitialisedPersoenlicheAngabenForm($event)">
+    <app-persoenliche-angaben [persoenlicheAngabenFormGroup]="form.controls.user">
 
     </app-persoenliche-angaben>
     <button mat-button type="submit">Submit</button>
